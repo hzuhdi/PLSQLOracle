@@ -78,3 +78,28 @@ BEGIN
         fibosecond:= fibotemp;
     END LOOP;
 END;
+
+--QUESTION 5
+DECLARE
+    accountNumber VARCHAR(9):=&id;
+    subNr INT;
+    sub VARCHAR(1);
+    multip INT :=0;
+    beforeTotal INT :=0;
+    total INT :=0 ;
+    rest INT;
+BEGIN
+    dbms_output.put_line(accountNumber);
+    FOR a in REVERSE 1 .. 9 LOOP -- THIS ONE WE NEED TO SPECIFY REVERSE
+        sub := substr(accountNumber, a, 1);
+        subNr := to_number(sub);
+            dbms_output.put_line('Sub Number : ' || sub);
+        multip := multip + 1;
+        beforeTotal := multip * subNr;
+        total := total + beforeTotal;
+            dbms_output.put_line('Multiplication : ' || beforeTotal);
+            dbms_output.put_line('Total : ' || total);
+    END LOOP;
+        rest := mod(total, 11);
+        dbms_output.put_line(total || ' Modulo 11 : ' || rest);
+END;
