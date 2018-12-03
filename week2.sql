@@ -23,5 +23,20 @@ BEGIN
         dbms_output.put_line('Oops Not Found!');
 END;
 
---question2
-select * from JOB_HISTORY
+--q2
+DECLARE
+    dep_id employees.department_id%type:=&id;
+    emp_sal employees.salary%type;
+    counter INT:=0;
+BEGIN
+    UPDATE EMPLOYEES
+    SET salary = salary + (salary * 0.05)
+    WHERE department_id = dep_id;
+    
+    SELECT DISTINCT COUNT (employee_id) INTO counter FROM EMPLOYEES WHERE department_id = dep_id;
+    dbms_output.put_line('Total Employee raised : ' || counter);
+    
+    EXCEPTION
+        WHEN CASE_NOT_FOUND THEN
+        dbms_output.put_line('Dep Id not found');
+END;
