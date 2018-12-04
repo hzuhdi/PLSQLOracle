@@ -40,3 +40,44 @@ BEGIN
         WHEN CASE_NOT_FOUND THEN
         dbms_output.put_line('Dep Id not found');
 END;
+
+--q3 still not sure
+DECLARE
+    CURSOR emp_cursor IS
+    SELECT * FROM employees;
+    counter INT:=0;
+BEGIN
+IF (counter <= 20) THEN
+    for a in emp_cursor LOOP
+        DELETE from employees
+        WHERE
+        a.salary > 1000 AND a.salary < 4000;
+        counter:=counter+1;
+    END LOOP;
+END IF;
+        dbms_output.put_line('Total Employees Deleted : ' || counter);
+EXCEPTION
+    WHEN CASE_NOT_FOUND THEN
+    ROLLBACK;
+    dbms_output.put_line('Too much deleted : '|| counter ||' operation aborted');
+END;
+
+--q4 THIS one is when using cursor
+--but also we can use it without cursor
+
+DECLARE
+    input_lname employees.last_name%type:='&last_name';   
+    CURSOR emp_cursor(emp_lname employees.last_name%type) IS
+    SELECT *
+    FROM employees
+    WHERE last_name = emp_lname;
+    emp_record employees%ROWTYPE;
+BEGIN
+        FOR a in emp_cursor(input_lname)LOOP
+            dbms_output.put_line(a.first_name || ' THIS IS HIS FIRST NAME');
+        END LOOP;
+        
+EXCEPTION
+    WHEN CASE_NOT_FOUND THEN
+        dbms_output.put_line('Nothing found with last name of : ' || input_lname);
+END;
