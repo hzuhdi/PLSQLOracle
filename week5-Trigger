@@ -1,0 +1,90 @@
+--1
+SELECT * FROM president;
+-- The number of presidency years of a president can never be decreased
+CREATE OR REPLACE TRIGGER president_yrs_srv_change
+AFTER UPDATE OF YRS_SERV ON PRESIDENT
+BEGIN
+    RAISE_APPLICATION_ERROR(-20202, 'oops decrease of yrs_srv is not allowed');
+END;
+--invoke
+UPDATE president
+SET yrs_serv = 1
+WHERE pres_name='BUSH G';
+
+
+--2
+select * from election; 
+-- The total number of votes, per election year, of the elections after 1960, does not exceed 538.
+CREATE OR REPLACE TRIGGER election_limitation
+AFTER UPDATE OR INSERT ON election
+DECLARE
+    v_number NUMBER :=0;
+BEGIN
+    SELECT count(*)
+    INTO v_number
+    FROM election
+    WHERE election_year > 1960 AND votes > 538;
+        IF(v_number > 0) THEN
+            RAISE_APPLICATION_ERROR(-20202, 'Too much votes, Operations aborted');
+        END IF;
+END;
+
+--Invoke trigger
+UPDATE election
+SET votes = 570
+WHERE candidate = 'BUSH G W';
+
+--3
+-- Make sure a president can’t have more than 5 hobbies in the president database
+--
+CREATE OR REPLACE TRIGGER pres_hobby_limit
+--You also can delete the OF followed by PRES_NAME ...
+AFTER INSERT OR UPDATE OF PRES_NAME, HOBBY ON PRES_HOBBY
+DECLARE
+    v_count NUMBER :=0;
+    v_hobby NUMBER :=0;
+BEGIN
+    SELECT COUNT (hobby)
+    into v_hobby
+    FROM pres_hobby
+    WHERE pres_name = pres_name;
+        IF(v_hobby > 5) THEN
+            RAISE_APPLICATION_ERROR(-20202, 'Yo Sorry man, president is busy!');
+        END IF;
+END;
+--
+-- Invoke trigger
+--
+select * from pres_hobby
+INSERT INTO pres_hobby VALUES ('EISENHOWER D D', 'MANCING');
+
+--4
+--The inauguration year of a president must always occur at least 21 years after the date of birth of a president.
+--Pelatinkan
+--the easiest way is to make an assumption
+--you can never be a president if you are under 21 yo
+select * from president;
+select * from administration;
+
+CREATE OR REPLACE TRIGGER president_inauguration
+AFTER INSERT OR UPDATE OF admin_nr, pres_name, year_inaugurated ON ADMINISTRATION
+DECLARE
+    v_year NUMBER :=0;
+BEGIN
+    select yrs_serv
+    into v_year
+    FROM president 
+    WHERE pres_name = pres_name;
+        IF(pres_name = v_name) THEN
+            IF((year_inaugurated - v_year) >= 21) THEN
+                RAISE_APPLICATION_ERROR(-20202, 'Sorry you are too young bitch');
+            END IF;
+        END IF;
+END;
+
+drop trigger president_inauguration
+
+select * from all_triggers
+where table_name = 'election'
+
+
